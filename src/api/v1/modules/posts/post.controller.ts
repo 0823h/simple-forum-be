@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import PostService from "./post.services";
 import { Request as JWTRequest } from "express-jwt";
+import { io } from "../../../../server";
 
 class PostController {
   private postService: PostService;
@@ -12,6 +13,7 @@ class PostController {
   createPost = async (req: JWTRequest, res: Response, next: NextFunction) => {
     try {
       const post = await this.postService.createPost(req);
+      io.emit("refresh-data");
       return res.status(201).json({
         status: 201,
         message: "success",

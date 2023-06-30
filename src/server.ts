@@ -6,8 +6,11 @@ import cookieParser from "cookie-parser";
 import router from "./api/v1/modules/index";
 import models from "./../src/configs/database/models/index";
 import db from "./../src/configs/database/database";
+import { Server, Socket } from "socket.io";
+import { createServer } from "http";
 
 import { config } from "dotenv";
+import { create } from "ts-node";
 
 config();
 
@@ -44,7 +47,32 @@ app.use("*", (req: Request, res: Response, next: NextFunction) => {
 
 app.use(errorHandler);
 
-app.listen(3000, async () => {
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+    // allowedHeaders: ["my-custom-header"],
+    credentials: true,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("a user connected");
+
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
+
+  socket.on("refresh", (data) => {
+    console.log("new data received:", data);
+    io.emit("newData", data);
+  });
+});
+
+export { io };
+
+server.listen(3000, async () => {
   try {
     await db.sequelize?.sync({ alter: true });
     await models.associate?.();

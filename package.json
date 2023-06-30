@@ -24,6 +24,7 @@
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.11.0",
     "sequelize": "^6.32.1",
+    "socket.io": "^4.7.0",
     "ts-node": "^10.9.1"
   }
 }
